@@ -336,6 +336,31 @@
             window.location.href = `index.html?next=${next}`;
         }
 
+        async function consumeOAuthCallback() {
+            const params = new URLSearchParams(window.location.search);
+            const userToken = params.get("userToken");
+            if (!userToken) return false;
+
+            if (typeof Backendless.UserService.setCurrentUserToken === "function") {
+                Backendless.UserService.setCurrentUserToken(userToken);
+            }
+
+            const isValid = typeof Backendless.UserService.isValidLogin === "function"
+                ? await Backendless.UserService.isValidLogin()
+                : true;
+
+            if (!isValid) return false;
+
+            params.delete("userToken");
+            params.delete("userId");
+            const cleanQuery = params.toString();
+            const cleanUrl = cleanQuery
+                ? `${window.location.pathname}?${cleanQuery}`
+                : window.location.pathname;
+            window.history.replaceState({}, "", cleanUrl);
+            return true;
+        }
+
         async function ensureAuthenticated() {
             const currentUser = Backendless.UserService.getCurrentUser();
             if (!currentUser) {
@@ -518,6 +543,7 @@
             Backendless.initApp(BACKENDLESS_APP_URL);
             productsStore = Backendless.Data.of(PRODUCTS_TABLE);
 
+            await consumeOAuthCallback();
             const allowed = await ensureAuthenticated();
             if (!allowed) return;
 
