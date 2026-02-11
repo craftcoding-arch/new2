@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر الأدوات المنزلية - صفحة الإضافة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #e8c547;
+            --dark-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary-color), #1a3d7a);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            color: var(--secondary-color);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            padding: 0.6rem 1rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .admin-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 0.8rem;
+            font-size: 1rem;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .products-list {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.3rem;
+            border-radius: 4px;
+        }
+
+        .btn-edit { color: var(--primary-color); }
+        .btn-delete { color: #dc3545; }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-user-shield"></i>
+                <span>صفحة إضافة المنتجات</span>
+            </div>
+            <div class="header-actions">
+                <button id="logout-btn" class="btn btn-danger">تسجيل الخروج</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <h2 class="section-title">إدارة المنتجات</h2>
+        <div id="admin-alert" class="alert"></div>
+
+        <div class="admin-container">
+            <div class="card">
+                <h3 style="margin-bottom: 1.2rem; color: var(--primary-color);">
+                    <i class="fas fa-plus-circle"></i> إضافة أو تعديل منتج
+                </h3>
+
+                <form id="product-form">
+                    <div class="form-group">
+                        <label for="product-name">اسم المنتج *</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-description">وصف المنتج *</label>
+                        <textarea id="product-description" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-price">السعر (ر.س) *</label>
+                            <input type="number" id="product-price" min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-category">الفئة *</label>
+                            <select id="product-category" required>
+                                <option value="">اختر فئة</option>
+                                <option value="أدوات المطبخ">أدوات المطبخ</option>
+                                <option value="أدوات التنظيف">أدوات التنظيف</option>
+                                <option value="الأثاث المنزلي">الأثاث المنزلي</option>
+                                <option value="الإضاءة">الإضاءة</option>
+                                <option value="أدوات الحمام">أدوات الحمام</option>
+                                <option value="أدوات التخزين">أدوات التخزين</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-image-file">صورة المنتج من الجهاز *</label>
+                        <input type="file" id="product-image-file" accept="image/*">
+                        <input type="hidden" id="product-image-url">
+                        <small style="display: block; margin-top: 0.5rem; color: #6c757d;">
+                            عند تعديل منتج، اترك الحقل فارغًا إذا كنت لا تريد تغيير الصورة.
+                        </small>
+                    </div>
+
+                    <input type="hidden" id="product-id">
+
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button type="submit" id="submit-btn" class="btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ المنتج
+                        </button>
+                        <button type="button" id="reset-btn" class="btn" style="background-color: #6c757d; color: white;">
+                            <i class="fas fa-redo"></i> مسح النموذج
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="products-list">
+                <h3 style="padding: 1.2rem 1.2rem 0; color: var(--primary-color);">
+                    <i class="fas fa-list"></i> قائمة المنتجات
+                </h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الصورة</th>
+                            <th>اسم المنتج</th>
+                            <th>الفئة</th>
+                            <th>السعر</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
+    <script>
+        const BACKENDLESS_APP_URL = "https://subtlegrass-us.backendless.app";
+        const PRODUCTS_TABLE = "Products";
+        const PRODUCT_IMAGES_PATH = "product-images";
+
+        let products = [];
+        let productsStore = null;
+
+        function showAlert(message, type) {
+            const alert = document.getElementById("admin-alert");
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = "block";
+
+            setTimeout(() => {
+                alert.style.display = "none";
+            }, 3000);
+        }
+
+        function redirectToLogin() {
+            const next = encodeURIComponent("admin.html");
+            window.location.href = `login.html?next=${next}`;
+        }
+
+        async function ensureAuthenticated() {
+            const currentUser = Backendless.UserService.getCurrentUser();
+            if (!currentUser) {
+                redirectToLogin();
+                return false;
+            }
+
+            if (typeof Backendless.UserService.isValidLogin === "function") {
+                const isValid = await Backendless.UserService.isValidLogin();
+                if (!isValid) {
+                    await Backendless.UserService.logout();
+                    redirectToLogin();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        async function loadProducts() {
+            products = await productsStore.find();
+        }
+
+        async function uploadProductImage(file) {
+            if (!file) return "";
+            if (!file.type.startsWith("image/")) {
+                throw new Error("الملف المحدد ليس صورة.");
+            }
+
+            const folder = `${PRODUCT_IMAGES_PATH}/${Date.now()}`;
+            const uploadResult = await Backendless.Files.upload(file, folder, true);
+            return typeof uploadResult === "string"
+                ? uploadResult
+                : uploadResult.fileURL || uploadResult.url || "";
+        }
+
+        function displayProductsTable() {
+            const tableBody = document.getElementById("products-table-body");
+            tableBody.innerHTML = "";
+
+            if (!products.length) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">لا توجد منتجات بعد.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            products.forEach((product) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><img src="${product.image}" alt="${product.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"></td>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>${Number(product.price).toFixed(2)} ر.س</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-icon btn-edit" onclick="editProduct('${product.objectId}')" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon btn-delete" onclick="deleteProduct('${product.objectId}')" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function refreshProductsView() {
+            await loadProducts();
+            displayProductsTable();
+        }
+
+        async function handleProductFormSubmit(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById("submit-btn");
+            const productId = document.getElementById("product-id").value;
+            const name = document.getElementById("product-name").value.trim();
+            const description = document.getElementById("product-description").value.trim();
+            const price = parseFloat(document.getElementById("product-price").value);
+            const category = document.getElementById("product-category").value;
+            const imageFileInput = document.getElementById("product-image-file");
+            const selectedFile = imageFileInput.files[0];
+            const currentImageUrl = document.getElementById("product-image-url").value;
+
+            if (!name || !description || Number.isNaN(price) || !category) {
+                showAlert("يرجى ملء جميع الحقول المطلوبة", "error");
+                return;
+            }
+
+            if (price < 0) {
+                showAlert("السعر يجب أن يكون رقمًا موجبًا", "error");
+                return;
+            }
+
+            if (!selectedFile && !currentImageUrl) {
+                showAlert("يرجى اختيار صورة من الجهاز", "error");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جار الحفظ...';
+
+            try {
+                let imageUrl = currentImageUrl;
+                if (selectedFile) {
+                    imageUrl = await uploadProductImage(selectedFile);
+                }
+
+                const payload = { name, description, price, category, image: imageUrl };
+
+                if (productId) {
+                    await productsStore.save({ objectId: productId, ...payload });
+                    showAlert("تم تحديث المنتج بنجاح", "success");
+                } else {
+                    await productsStore.save(payload);
+                    showAlert("تم إضافة المنتج بنجاح", "success");
+                }
+
+                await refreshProductsView();
+                resetForm();
+            } catch (error) {
+                showAlert(`فشل حفظ المنتج: ${error.message}`, "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = productId
+                    ? '<i class="fas fa-save"></i> تحديث المنتج'
+                    : '<i class="fas fa-save"></i> حفظ المنتج';
+            }
+        }
+
+        function editProduct(objectId) {
+            const product = products.find((p) => p.objectId === objectId);
+            if (!product) return;
+
+            document.getElementById("product-id").value = product.objectId;
+            document.getElementById("product-name").value = product.name;
+            document.getElementById("product-description").value = product.description;
+            document.getElementById("product-price").value = product.price;
+            document.getElementById("product-category").value = product.category;
+            document.getElementById("product-image-url").value = product.image;
+            document.getElementById("product-image-file").value = "";
+            document.getElementById("submit-btn").innerHTML = '<i class="fas fa-save"></i> تحديث المنتج';
+
+            document.querySelector(".card").scrollIntoView({ behavior: "smooth" });
+        }
+
+        async function deleteProduct(objectId) {
+            if (!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
+
+            try {
+                await productsStore.removeById(objectId);
+                await refreshProductsView();
+                showAlert("تم حذف المنتج بنجاح", "success");
+            } catch (error) {
+                showAlert(`فشل حذف المنتج: ${error.message}`, "error");
+            }
+        }
+
+        function resetForm() {
+            document.getElementById("product-form").reset();
+            document.getElementById("product-id").value = "";
+            document.getElementById("product-image-url").value = "";
+            document.getElementById("submit-btn").innerHTML = '<i class="fas fa-save"></i> حفظ المنتج';
+        }
+
+        async function logout() {
+            try {
+                await Backendless.UserService.logout();
+            } finally {
+                redirectToLogin();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async function() {
+            Backendless.initApp(BACKENDLESS_APP_URL);
+            productsStore = Backendless.Data.of(PRODUCTS_TABLE);
+
+            const allowed = await ensureAuthenticated();
+            if (!allowed) return;
+
+            document.getElementById("product-form").addEventListener("submit", handleProductFormSubmit);
+            document.getElementById("reset-btn").addEventListener("click", resetForm);
+            document.getElementById("logout-btn").addEventListener("click", logout);
+
+            try {
+                await refreshProductsView();
+            } catch (error) {
+                showAlert(`فشل تحميل المنتجات: ${error.message}`, "error");
+            }
+        });
+    </script>
+</body>
+</html>
