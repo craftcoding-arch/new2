@@ -269,7 +269,9 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جار التحويل...';
 
             try {
-                const redirectAfterLoginUrl = new URL(getNextPage(), window.location.href).href;
+                // ارجع دائمًا إلى صفحة الدخول نفسها (index.html) مع next
+                // ثم bootstrap يتحقق من الجلسة وينقل المستخدم إلى admin.html.
+                const redirectAfterLoginUrl = window.location.href.split("#")[0];
                 let authUrl = null;
                 let lastError = null;
 
