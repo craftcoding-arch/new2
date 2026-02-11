@@ -145,6 +145,28 @@
         .btn-primary:hover {
             background: #1f4a8e;
         }
+
+        .divider {
+            text-align: center;
+            color: #7a7a7a;
+            margin: 0.8rem 0;
+            font-size: 0.9rem;
+        }
+
+        .btn-google {
+            width: 100%;
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -176,12 +198,21 @@
 
                 <button id="login-btn" type="submit" class="btn-primary">تسجيل الدخول</button>
             </form>
+
+            <div class="divider">أو</div>
+            <button id="google-login-btn" type="button" class="btn-google">
+                <i class="fab fa-google"></i>
+                تسجيل الدخول عبر Google
+            </button>
         </section>
     </main>
 
     <script src="https://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
     <script>
         const BACKENDLESS_APP_URL = "https://subtlegrass-us.backendless.app";
+        // ضع القيمة كما تظهر في Backendless Console > Users > Login Providers
+        // سيتم تجربة القائمة بالترتيب حتى يتم العثور على المزود الصحيح.
+        const GOOGLE_PROVIDER_CODES = ["googleplus", "google", "google-oauth2"];
 
         function showError(message) {
             const alert = document.getElementById("login-alert");
@@ -232,10 +263,48 @@
             }
         }
 
+        async function handleGoogleLogin() {
+            const btn = document.getElementById("google-login-btn");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جار التحويل...';
+
+            try {
+                const redirectAfterLoginUrl = new URL(getNextPage(), window.location.href).href;
+                let authUrl = null;
+                let lastError = null;
+
+                for (const providerCode of GOOGLE_PROVIDER_CODES) {
+                    try {
+                        authUrl = await Backendless.UserService.getAuthorizationUrlLink(
+                            providerCode,
+                            null,
+                            null,
+                            false,
+                            redirectAfterLoginUrl
+                        );
+                        if (authUrl) break;
+                    } catch (error) {
+                        lastError = error;
+                    }
+                }
+
+                if (!authUrl) {
+                    throw lastError || new Error("Google provider غير مفعّل في Backendless.");
+                }
+
+                window.location.href = typeof authUrl === "string" ? authUrl : authUrl.url;
+            } catch (error) {
+                showError(`فشل تسجيل الدخول عبر Google: ${error.message}. تأكد من تفعيل Google Login Provider في Backendless.`);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fab fa-google"></i> تسجيل الدخول عبر Google';
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", async function() {
             try {
                 await bootstrap();
                 document.getElementById("login-form").addEventListener("submit", handleLoginSubmit);
+                document.getElementById("google-login-btn").addEventListener("click", handleGoogleLogin);
             } catch (error) {
                 showError(`خطأ في التهيئة: ${error.message}`);
             }
