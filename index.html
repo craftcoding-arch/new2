@@ -226,8 +226,39 @@
             return next || "admin.html";
         }
 
+        async function consumeOAuthCallback() {
+            const params = new URLSearchParams(window.location.search);
+            const userToken = params.get("userToken");
+            if (!userToken) return false;
+
+            if (typeof Backendless.UserService.setCurrentUserToken === "function") {
+                Backendless.UserService.setCurrentUserToken(userToken);
+            }
+
+            const isValid = typeof Backendless.UserService.isValidLogin === "function"
+                ? await Backendless.UserService.isValidLogin()
+                : true;
+
+            if (!isValid) return false;
+
+            // تنظيف بارامترات OAuth من الرابط بعد نجاح التحقق
+            params.delete("userToken");
+            params.delete("userId");
+            const cleanQuery = params.toString();
+            const cleanUrl = cleanQuery
+                ? `${window.location.pathname}?${cleanQuery}`
+                : window.location.pathname;
+            window.history.replaceState({}, "", cleanUrl);
+
+            window.location.href = getNextPage();
+            return true;
+        }
+
         async function bootstrap() {
             Backendless.initApp(BACKENDLESS_APP_URL);
+
+            const handledOAuth = await consumeOAuthCallback();
+            if (handledOAuth) return;
 
             const currentUser = Backendless.UserService.getCurrentUser();
             if (currentUser) {
