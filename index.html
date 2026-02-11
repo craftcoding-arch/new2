@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - لوحة الإدارة</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -226,6 +227,16 @@
             return next || "admin.html";
         }
 
+        function buildCleanLoginUrl() {
+            const url = new URL(window.location.href);
+            const next = url.searchParams.get("next");
+            url.search = "";
+            if (next) {
+                url.searchParams.set("next", next);
+            }
+            return url.toString();
+        }
+
         async function consumeOAuthCallback() {
             const params = new URLSearchParams(window.location.search);
             const userToken = params.get("userToken");
@@ -297,9 +308,9 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جار التحويل...';
 
             try {
-                // ارجع دائمًا إلى صفحة الدخول نفسها (index.html) مع next
-                // ثم bootstrap يتحقق من الجلسة وينقل المستخدم إلى admin.html.
-                const redirectAfterLoginUrl = window.location.href.split("#")[0];
+                // ارجع إلى نفس صفحة الدخول ولكن بدون userToken/userId القديمة
+                // لمنع تكرار بارامترات OAuth في الرابط.
+                const redirectAfterLoginUrl = buildCleanLoginUrl();
                 let authUrl = null;
                 let lastError = null;
 
