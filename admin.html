@@ -367,6 +367,13 @@
                         <label for="ad-text">نص الإعلان</label>
                         <textarea id="ad-text" placeholder="اكتب نص الإعلان المتحرك أعلى صفحة المتجر"></textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="whatsapp-number">رقم واتساب المتجر</label>
+                        <input type="tel" id="whatsapp-number" placeholder="مثال: 963957618772">
+                        <small style="display: block; margin-top: 0.5rem; color: #6c757d;">
+                            يجب أن يبدأ الرقم بـ <strong>+963</strong>
+                        </small>
+                    </div>
                     <button type="submit" id="ad-submit-btn" class="btn btn-primary">
                         <i class="fas fa-save"></i> حفظ الإعلان
                     </button>
@@ -477,6 +484,7 @@
         const PRODUCTS_TABLE = "Products";
         const SETTINGS_TABLE = "StoreSettings";
         const AD_SETTING_KEY = "top_ad_text";
+        const WHATSAPP_SETTING_KEY = "store_whatsapp_number";
         const PRODUCT_IMAGES_PATH = "product-images";
 
         let products = [];
@@ -562,6 +570,20 @@
             document.getElementById("ad-text").value = fallback && fallback.length
                 ? fallback[0].settingValue || fallback[0].adText || ""
                 : "";
+        }
+
+        async function loadWhatsAppNumber() {
+            const queryBuilder = Backendless.DataQueryBuilder.create();
+            queryBuilder.setWhereClause(`settingKey = '${WHATSAPP_SETTING_KEY}'`);
+            queryBuilder.setPageSize(1);
+
+            const result = await settingsStore.find(queryBuilder);
+            if (result && result.length) {
+                document.getElementById("whatsapp-number").value = result[0].settingValue || "";
+                return;
+            }
+
+            document.getElementById("whatsapp-number").value = "";
         }
 
         async function uploadProductImage(file) {
@@ -791,6 +813,7 @@
             e.preventDefault();
             const submitBtn = document.getElementById("ad-submit-btn");
             const adText = document.getElementById("ad-text").value.trim();
+            const whatsappNumber = document.getElementById("whatsapp-number").value.trim();
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جار الحفظ...';
@@ -814,9 +837,27 @@
                     });
                 }
 
-                showAlert("تم حفظ نص الإعلان بنجاح", "success");
+                const whatsappQuery = Backendless.DataQueryBuilder.create();
+                whatsappQuery.setWhereClause(`settingKey = '${WHATSAPP_SETTING_KEY}'`);
+                whatsappQuery.setPageSize(1);
+                const existingWhatsapp = await settingsStore.find(whatsappQuery);
+
+                if (existingWhatsapp && existingWhatsapp.length) {
+                    await settingsStore.save({
+                        objectId: existingWhatsapp[0].objectId,
+                        settingKey: WHATSAPP_SETTING_KEY,
+                        settingValue: whatsappNumber
+                    });
+                } else {
+                    await settingsStore.save({
+                        settingKey: WHATSAPP_SETTING_KEY,
+                        settingValue: whatsappNumber
+                    });
+                }
+
+                showAlert("تم حفظ إعدادات المتجر بنجاح", "success");
             } catch (error) {
-                showAlert(`فشل حفظ الإعلان: ${error.message}`, "error");
+                showAlert(`فشل حفظ الإعدادات: ${error.message}`, "error");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ الإعلان';
@@ -858,6 +899,7 @@
             try {
                 await refreshProductsView();
                 await loadAdText();
+                await loadWhatsAppNumber();
                 document.getElementById("product-code").value = generateUniqueCode();
             } catch (error) {
                 showAlert(`فشل تحميل المنتجات: ${error.message}`, "error");
