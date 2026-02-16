@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نموذج متجر الكتروني - صفحة الإضافة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -18,7 +21,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Cairo', sans-serif;
         }
 
         body {
@@ -59,6 +62,19 @@
             display: flex;
             gap: 0.75rem;
             align-items: center;
+        }
+
+        .products-toolbar {
+            padding: 0.8rem 1.2rem 1rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .products-toolbar select {
+            width: auto;
+            min-width: 220px;
         }
 
         .btn {
@@ -120,6 +136,37 @@
             gap: 2rem;
         }
 
+        .section-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-tab {
+            border: 1px solid #d0d7e2;
+            background: white;
+            color: var(--primary-color);
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .section-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
         .card {
             background-color: white;
             border-radius: var(--border-radius);
@@ -164,39 +211,23 @@
             overflow: hidden;
         }
 
-        .products-toolbar {
-            padding: 0.8rem 1.2rem 1rem;
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .products-toolbar select {
-            width: auto;
-            min-width: 220px;
-        }
-
         .products-cards {
             display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 1rem;
             padding: 0 1.2rem 1.2rem;
         }
 
         .product-card {
-            border: 1px solid #eee;
-            border-radius: 10px;
-            padding: 0.9rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            background: #fff;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            padding: 0.75rem;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            gap: 0.25rem;
+            gap: 0.3rem;
             width: 100%;
-            height: auto;
-            overflow: hidden;
         }
 
         .product-card-image {
@@ -215,14 +246,23 @@
             line-height: 1.25;
         }
 
+        .product-price {
+            margin: 0;
+            font-weight: 700;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
         .product-meta {
             margin: 0;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             line-height: 1.25;
+            color: #6c757d;
         }
 
         .product-card .actions {
-            margin-top: 0.2rem;
+            margin-top: auto;
+            justify-content: flex-start;
         }
 
         .product-card .btn-icon {
@@ -254,11 +294,14 @@
 
         .btn-edit { color: var(--primary-color); }
         .btn-delete { color: #dc3545; }
-
         .form-actions {
             display: flex;
             gap: 0.75rem;
             flex-wrap: wrap;
+        }
+
+        body * {
+            font-size: 11px !important;
         }
 
         @media (max-width: 768px) {
@@ -315,7 +358,7 @@
             }
 
             .products-cards {
-                grid-template-columns: repeat(5, minmax(0, 1fr));
+                grid-template-columns: repeat(3, minmax(0, 1fr));
                 padding: 0 0.75rem 0.75rem;
             }
 
@@ -325,7 +368,7 @@
             }
 
             .product-card-image {
-                height: 150px;
+                height: 95px;
             }
 
             .actions {
@@ -356,9 +399,14 @@
     <main>
         <h2 class="section-title">إدارة المنتجات</h2>
         <div id="admin-alert" class="alert"></div>
+        <div class="section-tabs">
+            <button type="button" class="section-tab active" data-section="section-products-list">تعديل المنتجات</button>
+            <button type="button" class="section-tab" data-section="section-product-form">إضافة أو تعديل منتج</button>
+            <button type="button" class="section-tab" data-section="section-ad-settings">إعدادات الإعلان</button>
+        </div>
 
         <div class="admin-container">
-            <div class="card">
+            <div id="section-ad-settings" class="card admin-section">
                 <h3 style="margin-bottom: 1.2rem; color: var(--primary-color);">
                     <i class="fas fa-bullhorn"></i> إعدادات الإعلان
                 </h3>
@@ -380,7 +428,7 @@
                 </form>
             </div>
 
-            <div class="card">
+            <div id="section-product-form" class="card admin-section">
                 <h3 style="margin-bottom: 1.2rem; color: var(--primary-color);">
                     <i class="fas fa-plus-circle"></i> إضافة أو تعديل منتج
                 </h3>
@@ -463,9 +511,9 @@
                 </form>
             </div>
 
-            <div class="products-list">
+            <div id="section-products-list" class="products-list admin-section active">
                 <h3 style="padding: 1.2rem 1.2rem 0; color: var(--primary-color);">
-                    <i class="fas fa-list"></i> قائمة المنتجات
+                    <i class="fas fa-pen-to-square"></i> تعديل المنتجات
                 </h3>
                 <div class="products-toolbar">
                     <label for="products-filter-category" style="margin: 0; color: var(--primary-color);">فرز حسب التصنيف:</label>
@@ -490,6 +538,21 @@
         let products = [];
         let productsStore = null;
         let settingsStore = null;
+        const integerFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+        const priceFormatter = new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+        function toNumber(value) {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        function formatInteger(value) {
+            return integerFormatter.format(toNumber(value));
+        }
+
+        function formatPrice(value) {
+            return priceFormatter.format(toNumber(value));
+        }
 
         function showAlert(message, type) {
             const alert = document.getElementById("admin-alert");
@@ -618,12 +681,7 @@
                 card.innerHTML = `
                     <img class="product-card-image" src="${product.image}" alt="${product.name}">
                     <h4 class="product-card-title">${product.name}</h4>
-                    <p class="product-meta"><strong>الكود:</strong> ${product.productnum || "-"}</p>
-                    <p class="product-meta"><strong>الصناعة:</strong> ${product.manufacture || "-"}</p>
-                    <p class="product-meta"><strong>الماركة:</strong> ${product.brand || "-"}</p>
-                    <p class="product-meta"><strong>الفئة:</strong> ${product.category}</p>
-                    <p class="product-meta"><strong>السعر:</strong> ${Number(product.price).toFixed(2)} ر.س</p>
-                    <p class="product-meta"><strong>الكمية:</strong> ${Number.isFinite(Number(product.quantity)) ? Number(product.quantity) : 0}</p>
+                    <p class="product-price">${formatPrice(product.price)}</p>
                     <div class="actions">
                         <button class="btn-icon btn-edit" data-action="edit" data-id="${product.objectId}" title="تعديل">
                             <i class="fas fa-edit"></i>
@@ -772,7 +830,7 @@
             document.getElementById("product-image-file").value = "";
             document.getElementById("submit-btn").innerHTML = '<i class="fas fa-save"></i> تحديث المنتج';
 
-            document.querySelector(".card").scrollIntoView({ behavior: "smooth" });
+            setActiveSection("section-product-form");
         }
 
         async function deleteProduct(objectId) {
@@ -880,6 +938,25 @@
             }
         }
 
+        function setActiveSection(sectionId) {
+            const tabs = document.querySelectorAll(".section-tab[data-section]");
+            const sections = document.querySelectorAll(".admin-section");
+
+            tabs.forEach((tab) => {
+                tab.classList.toggle("active", tab.getAttribute("data-section") === sectionId);
+            });
+
+            sections.forEach((section) => {
+                section.classList.toggle("active", section.id === sectionId);
+            });
+        }
+
+        function handleSectionTabClick(event) {
+            const tab = event.target.closest(".section-tab[data-section]");
+            if (!tab) return;
+            setActiveSection(tab.getAttribute("data-section"));
+        }
+
         document.addEventListener("DOMContentLoaded", async function() {
             Backendless.initApp(BACKENDLESS_APP_URL);
             productsStore = Backendless.Data.of(PRODUCTS_TABLE);
@@ -893,6 +970,7 @@
             document.getElementById("product-form").addEventListener("submit", handleProductFormSubmit);
             document.getElementById("reset-btn").addEventListener("click", resetForm);
             document.getElementById("logout-btn").addEventListener("click", logout);
+            document.querySelector(".section-tabs").addEventListener("click", handleSectionTabClick);
             document.getElementById("products-filter-category").addEventListener("change", displayProductsTable);
             document.getElementById("products-cards").addEventListener("click", handleProductsTableClick);
 
@@ -900,6 +978,7 @@
                 await refreshProductsView();
                 await loadAdText();
                 await loadWhatsAppNumber();
+                setActiveSection("section-products-list");
                 document.getElementById("product-code").value = generateUniqueCode();
             } catch (error) {
                 showAlert(`فشل تحميل المنتجات: ${error.message}`, "error");
